@@ -22,7 +22,7 @@ This repository contains a comprehensive manufacturing simulation and interactiv
 
 ### Clone the Repository
 ```bash
-git clone https://github.com/YahwthaniMG/SG1_Team3.git
+git clone https://github.com/YahwthaniMG/SG1_Team3_Dashboard.git
 cd SG1_Team3
 ```
 
