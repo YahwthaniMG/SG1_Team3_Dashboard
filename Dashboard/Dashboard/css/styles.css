@@ -1,0 +1,33 @@
+/* Estilos para el visualizador de fechas */
+#dateVisualizer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.date-cell {
+    width: 30px;
+    height: 30px;
+    margin: 2px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+}
+
+.date-cell:hover {
+    background-color: #e9ecef;
+}
+
+.date-cell.active {
+    background-color: #007bff;
+    color: white;
+    font-weight: bold;
+}
