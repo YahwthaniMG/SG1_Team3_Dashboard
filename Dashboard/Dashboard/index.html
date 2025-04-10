@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Laptop Manufacturing Analysis Dashboard</title>
     
-    <!-- Referencias a archivos CSS -->
+    <!-- CSS file references -->
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/styles.css">
     
     <style>
-        /* Estilos adicionales para el dashboard */
+        /* Additional dashboard styles */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             padding: 20px;
@@ -44,7 +44,7 @@
             overflow: hidden;
         }
         
-        /* Estilos para el visualizador de fechas */
+        /* Date visualizer styles */
         .date-cell {
             width: 30px;
             height: 30px;
@@ -70,7 +70,7 @@
             font-weight: bold;
         }
         
-        /* Estilos para los KPIs */
+        /* KPI styles */
         .kpi-card {
             text-align: center;
             padding: 15px;
@@ -93,7 +93,7 @@
             font-size: 0.9rem;
         }
         
-        /* Botones de navegación */
+        /* Navigation buttons */
         .btn-icon {
             padding: 0.25rem 0.5rem;
             display: inline-flex;
@@ -111,24 +111,24 @@
                 <div class="col-md-8">
                     <div class="section-card">
                         <div class="section-header">
-                            Filtros de Tiempo
+                            Time Filters
                         </div>
                         <div class="section-body">
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="timeFilter">Período:</label>
+                                        <label for="timeFilter">Period:</label>
                                         <select id="timeFilter" class="form-control">
-                                            <option value="day" selected>Día</option>
-                                            <option value="week">Semana</option>
-                                            <option value="month">Mes</option>
-                                            <option value="quarter">Trimestre</option>
+                                            <option value="day" selected>Day</option>
+                                            <option value="week">Week</option>
+                                            <option value="month">Month</option>
+                                            <option value="quarter">Quarter</option>
                                         </select>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="startDate">Día inicial:</label>
+                                        <label for="startDate">Start Day:</label>
                                         <div class="input-group">
                                             <input type="number" id="startDate" class="form-control" min="1" max="100" value="1">
                                             <div class="input-group-append">
@@ -141,7 +141,7 @@
                             </div>
                             <div class="mt-3">
                                 <div id="dateRangeInfo" class="alert alert-info">
-                                    Mostrando datos del día 1
+                                    Showing data for day 1
                                 </div>
                             </div>
                         </div>
@@ -150,11 +150,11 @@
                 <div class="col-md-4">
                     <div class="section-card">
                         <div class="section-header">
-                            Simulación
+                            Simulation
                         </div>
                         <div class="section-body">
                             <button id="runSimulation" class="btn btn-primary btn-lg btn-block">
-                                Ejecutar Simulación
+                                Run Simulation
                             </button>
                             <div id="simulationStatus" class="mt-3"></div>
                         </div>
@@ -166,7 +166,7 @@
                 <div class="col-12">
                     <div class="section-card">
                         <div class="section-header">
-                            Vista de Calendario
+                            Calendar View
                         </div>
                         <div class="section-body">
                             <div id="dateVisualizer" class="d-flex flex-wrap justify-content-center"></div>
@@ -177,29 +177,29 @@
         </header>
         
         <main>
-            <!-- Sección 1: Resumen de Producción -->
+            <!-- Section 1: Production Summary -->
             <section id="productionSummary" class="section-card">
                 <div class="section-header">
-                    <h2 class="h4 m-0">Resumen de Producción</h2>
+                    <h2 class="h4 m-0">Production Summary</h2>
                 </div>
                 <div class="section-body">
                     <div class="row mb-4">
                         <div class="col-md-4">
                             <div class="card kpi-card bg-light">
                                 <div class="kpi-value text-primary" id="totalProductionKPI">0</div>
-                                <div class="kpi-label">Producción Total</div>
+                                <div class="kpi-label">Total Production</div>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="card kpi-card bg-light">
                                 <div class="kpi-value text-danger" id="faultyProductsKPI">0</div>
-                                <div class="kpi-label">Productos Defectuosos</div>
+                                <div class="kpi-label">Faulty Products</div>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="card kpi-card bg-light">
                                 <div class="kpi-value text-warning" id="faultyRateKPI">0%</div>
-                                <div class="kpi-label">Tasa de Fallos</div>
+                                <div class="kpi-label">Failure Rate</div>
                             </div>
                         </div>
                     </div>
@@ -207,10 +207,10 @@
                 </div>
             </section>
             
-            <!-- Sección 2: Rendimiento por Estación de Trabajo -->
+            <!-- Section 2: Workstation Performance -->
             <section id="stationPerformance" class="section-card">
                 <div class="section-header">
-                    <h2 class="h4 m-0">Rendimiento por Estación de Trabajo</h2>
+                    <h2 class="h4 m-0">Workstation Performance</h2>
                 </div>
                 <div class="section-body">
                     <div class="row">
@@ -224,10 +224,10 @@
                 </div>
             </section>
             
-            <!-- Sección 3: Análisis de Cuellos de Botella -->
+            <!-- Section 3: Bottleneck Analysis -->
             <section id="bottleneckAnalysis" class="section-card">
                 <div class="section-header">
-                    <h2 class="h4 m-0">Análisis de Cuellos de Botella</h2>
+                    <h2 class="h4 m-0">Bottleneck Analysis</h2>
                 </div>
                 <div class="section-body">
                     <div class="row">
@@ -237,12 +237,12 @@
                         <div class="col-md-4">
                             <div class="card">
                                 <div class="card-header bg-warning text-dark">
-                                    <h5 class="card-title m-0">Problemas Identificados</h5>
+                                    <h5 class="card-title m-0">Identified Issues</h5>
                                 </div>
                                 <div class="card-body">
                                     <div id="bottleneckInsights">
-                                        <p><strong>Estación 4 (Memoria):</strong> Esta estación tiene la mayor tasa de fallos (15%) y el mayor tiempo de inactividad.</p>
-                                        <p><strong>Impacto:</strong> Esto causa aproximadamente el 65% del total de productos defectuosos.</p>
+                                        <p><strong>Station 4 (Memory):</strong> This station has the highest failure rate (15%) and the longest downtime.</p>
+                                        <p><strong>Impact:</strong> This causes approximately 65% of all faulty products.</p>
                                     </div>
                                 </div>
                             </div>
@@ -251,19 +251,19 @@
                 </div>
             </section>
             
-            <!-- Sección 4: Escenarios de Optimización -->
+            <!-- Section 4: Optimization Scenarios -->
             <section id="optimizationScenarios" class="section-card">
                 <div class="section-header">
-                    <h2 class="h4 m-0">Escenarios de Optimización</h2>
+                    <h2 class="h4 m-0">Optimization Scenarios</h2>
                 </div>
                 <div class="section-body">
                     <div class="row">
                         <div class="col-md-3">
                             <div id="optimizationControls">
-                                <!-- Aquí se generarán los controles dinámicamente -->
+                                <!-- Controls will be generated dynamically here -->
                                 <div class="text-center my-3">
                                     <div class="spinner-border text-primary" role="status">
-                                        <span class="sr-only">Cargando...</span>
+                                        <span class="sr-only">Loading...</span>
                                     </div>
                                 </div>
                             </div>
@@ -275,10 +275,10 @@
                 </div>
             </section>
             
-            <!-- Sección 5: Métricas de Tiempo -->
+            <!-- Section 5: Time Metrics -->
             <section id="timeMetrics" class="section-card">
                 <div class="section-header">
-                    <h2 class="h4 m-0">Métricas de Tiempo</h2>
+                    <h2 class="h4 m-0">Time Metrics</h2>
                 </div>
                 <div class="section-body">
                     <div class="row">
@@ -294,11 +294,11 @@
         </main>
         
         <footer class="mt-5 pt-4 border-top text-center">
-            <p>Dashboard creado por SG1_Team3</p>
+            <p>Dashboard created by SG1_Team3</p>
         </footer>
     </div>
     
-    <!-- Referencias a archivos JavaScript -->
+    <!-- JavaScript file references -->
     <script src="js/d3.min.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/dataProcessor.js"></script>

@@ -1,58 +1,58 @@
 // main.js
 
-// Variables globales para instancias de los gráficos
+// Global variables for simulation data and charts
 let productionCharts;
 let stationCharts;
 let timeCharts;
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // Inicializar elementos UI
+    // Initialize UI elements
     initUI();
     
-    // Cargar datos iniciales
+    // Load initial data
     await loadSimulationResults();
     
-    // Inicializar visualizaciones
+    // Initialize visualizations
     initCharts();
     
-    // Configurar escenarios de optimización
+    // Set up optimization scenarios
     setupOptimizationScenario();
 });
 
 function initUI() {
-    // Configurar controles de fecha
+    // Set up date controls
     setupDateControls();
     
-    // Actualizar los controles de optimización
+    // Update optimization controls
     updateOptimizationControls();
 
-    // Configurar el botón de simulación
+    // Set up simulation button
     document.getElementById('runSimulation').addEventListener('click', async () => {
         try {
-            // Mostrar indicador de carga
+            // Show loading indicator
             const button = document.getElementById('runSimulation');
             const originalText = button.textContent;
             button.disabled = true;
-            button.textContent = 'Ejecutando...';
+            button.textContent = 'Running...';
             
-            // Mostrar estado de la simulación
+            // Show simulation status
             const simulationStatus = document.getElementById('simulationStatus');
             if (simulationStatus) {
                 simulationStatus.innerHTML = `
                     <div class="alert alert-info">
                         <div class="d-flex align-items-center">
                             <div class="spinner-border spinner-border-sm mr-2" role="status">
-                                <span class="sr-only">Ejecutando...</span>
+                                <span class="sr-only">Running...</span>
                             </div>
-                            <div>Ejecutando simulación...</div>
+                            <div>Running simulation...</div>
                         </div>
                     </div>
                 `;
             }
             
-            console.log("Iniciando simulación...");
+            console.log("Starting simulation...");
             
-            // Llamar al endpoint del servidor para ejecutar la simulación
+            // Call server endpoint to run simulation
             const response = await fetch('http://localhost:5000/run-simulation', {
                 method: 'POST',
                 headers: {
@@ -63,30 +63,30 @@ function initUI() {
             const data = await response.json();
             
             if (data.success) {
-                // Mostrar salida en la consola del navegador
-                console.log("Resultado de la simulación:");
+                // Show output in browser console
+                console.log("Simulation result:");
                 console.log(data.output);
                 
                 if (simulationStatus) {
                     simulationStatus.innerHTML = `
                         <div class="alert alert-success">
-                            <strong>Simulación completada exitosamente.</strong>
+                            <strong>Simulation completed successfully.</strong>
                         </div>
                     `;
                 }
                 
-                // Recargar los datos y actualizar gráficos
+                // Reload data and update charts
                 await loadSimulationResults();
                 updateAllCharts();
                 
-                console.log("Visualizaciones actualizadas con los nuevos datos");
+                console.log("Visualizations updated with new data");
             } else {
-                console.error("Error al ejecutar la simulación:", data.error);
+                console.error("Error running simulation:", data.error);
                 
                 if (simulationStatus) {
                     simulationStatus.innerHTML = `
                         <div class="alert alert-danger">
-                            <strong>Error al ejecutar la simulación.</strong>
+                            <strong>Error running simulation.</strong>
                             <p>${data.error}</p>
                         </div>
                     `;
@@ -99,14 +99,14 @@ function initUI() {
             if (simulationStatus) {
                 simulationStatus.innerHTML = `
                     <div class="alert alert-danger">
-                        <strong>Error de conexión:</strong>
+                        <strong>Connection error:</strong>
                         <p>${error.message}</p>
                     </div>
                 `;
             }
         } finally {
-            // Restaurar botón
-            const originalText = "Ejecutar Simulación"; 
+            // Restore button
+            const originalText = "Run Simulation"; 
             const button = document.getElementById('runSimulation');
             button.disabled = false;
             button.textContent = originalText;
@@ -115,10 +115,10 @@ function initUI() {
 }
 
 function setupDateControls() {
-    // Inicializar visualizador de calendario
+    // Initialize calendar visualizer
     updateDateVisualizer();
     
-    // Evento para cambio de período
+    // Event for period change
     document.getElementById('timeFilter').addEventListener('change', (e) => {
         currentPeriod = e.target.value;
         validateDateRange();
@@ -127,7 +127,7 @@ function setupDateControls() {
         updateAllCharts();
     });
     
-    // Evento para cambio de fecha inicial
+    // Event for start date change
     document.getElementById('startDate').addEventListener('change', (e) => {
         currentStartDate = parseInt(e.target.value);
         validateDateRange();
@@ -136,7 +136,7 @@ function setupDateControls() {
         updateAllCharts();
     });
     
-    // Botones de navegación
+    // Navigation buttons
     document.getElementById('prevDate').addEventListener('click', () => {
         let step = getPeriodLength();
         currentStartDate = Math.max(1, currentStartDate - step);
@@ -158,45 +158,45 @@ function setupDateControls() {
         updateAllCharts();
     });
     
-    // Inicializar información de rango de fechas
+    // Initialize date range info
     updateDateRangeInfo();
 }
 
 async function loadSimulationResults() {
     try {
-        console.log("Cargando resultados de la simulación...");
+        console.log("Loading simulation results...");
         
         const response = await fetch('http://localhost:5000/get-simulation-results');
         
         if (!response.ok) {
-            throw new Error(`Error HTTP: ${response.status}`);
+            throw new Error(`HTTP error: ${response.status}`);
         }
         
         const data = await response.json();
         
         if (data.success) {
-            // Almacenar los datos para usarlos en las visualizaciones
+            // Store data for use in visualizations
             window.simulationData = data;
-            console.log("Datos cargados correctamente");
+            console.log("Data loaded successfully");
             return data;
         } else {
-            console.error("Error al cargar los datos:", data.error);
+            console.error("Error loading data:", data.error);
             
-            // Generar datos de prueba en caso de error
+            // Generate test data in case of error
             window.simulationData = generateTestData();
             return window.simulationData;
         }
     } catch (error) {
-        console.error("Error al cargar los resultados:", error);
+        console.error("Error loading results:", error);
         
-        // Generar datos de prueba en caso de error
+        // Generate test data in case of error
         window.simulationData = generateTestData();
         return window.simulationData;
     }
 }
 
 function generateTestData() {
-    // Datos de prueba para desarrollo cuando no se puede conectar al servidor
+    // Test data for development when unable to connect to server
     return {
         success: true,
         runs: Array.from({ length: 100 }, (_, i) => {
@@ -234,28 +234,28 @@ function generateTestData() {
 }
 
 function initCharts() {
-    console.log("Inicializando gráficos...");
+    console.log("Initializing charts...");
     
     if (!window.simulationData) {
-        console.warn("No hay datos disponibles para los gráficos");
+        console.warn("No data available for charts");
         return;
     }
     
-    // Crear instancias de gráficos
+    // Create chart instances
     productionCharts = new ProductionCharts();
     stationCharts = new StationCharts();
     timeCharts = new TimeCharts();
     
-    // Inicializar todos los gráficos
+    // Initialize all charts
     productionCharts.createCharts();
     stationCharts.createCharts();
     timeCharts.createCharts();
     
-    console.log("Gráficos inicializados correctamente");
+    console.log("Charts initialized successfully");
 }
 
 function updateAllCharts() {
-    console.log(`Actualizando todos los gráficos con período: ${currentPeriod}, desde el día: ${currentStartDate}`);
+    console.log(`Updating all charts with period: ${currentPeriod}, starting from day: ${currentStartDate}`);
     
     if (productionCharts) {
         productionCharts.updateCharts();
@@ -269,8 +269,8 @@ function updateAllCharts() {
         timeCharts.updateCharts();
     }
     
-    // Actualizar los controles de optimización
+    // Update optimization controls
     updateOptimizationControls();
     
-    console.log("Visualizaciones actualizadas correctamente");
+    console.log("Visualizations updated successfully");
 }

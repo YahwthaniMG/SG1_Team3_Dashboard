@@ -1,9 +1,9 @@
-// Variables globales para el control de fechas
+// Global variables for date control
 let currentPeriod = 'day';
 let currentStartDate = 1;
-const MAX_RUN = 100; // Total de runs/días disponibles
+const MAX_RUN = 100; // Total available runs/days
 
-// Función para obtener la longitud del período seleccionado
+// Function to get the length of the selected period
 function getPeriodLength() {
     switch (currentPeriod) {
         case 'day': return 1;
@@ -14,17 +14,17 @@ function getPeriodLength() {
     }
 }
 
-// Función para formatear números
+// Function to format numbers
 function formatNumber(number, decimals = 2) {
     return number.toFixed(decimals);
 }
 
-// Función para formatear porcentajes
+// Function to format percentages
 function formatPercent(number) {
     return (number * 100).toFixed(2) + "%";
 }
 
-// Función para validar el rango de fechas seleccionado
+// Function to validate the selected date range
 function validateDateRange() {
     const periodLength = getPeriodLength();
     const maxStartDate = MAX_RUN - periodLength + 1;
@@ -37,30 +37,30 @@ function validateDateRange() {
         }
     }
     
-    // Actualizar el máximo permitido según el período
+    // Update maximum allowed based on period
     const startDateElement = document.getElementById('startDate');
     if (startDateElement) {
         startDateElement.max = maxStartDate;
     }
 }
 
-// Función para actualizar la información del rango de fechas
+// Function to update date range information
 function updateDateRangeInfo() {
     const endDate = currentStartDate + getPeriodLength() - 1;
     let rangeText = '';
     
     switch (currentPeriod) {
         case 'day':
-            rangeText = `Mostrando datos del día ${currentStartDate}`;
+            rangeText = `Showing data for day ${currentStartDate}`;
             break;
         case 'week':
-            rangeText = `Mostrando datos de la semana: días ${currentStartDate} - ${endDate}`;
+            rangeText = `Showing weekly data: days ${currentStartDate} - ${endDate}`;
             break;
         case 'month':
-            rangeText = `Mostrando datos del mes: días ${currentStartDate} - ${endDate}`;
+            rangeText = `Showing monthly data: days ${currentStartDate} - ${endDate}`;
             break;
         case 'quarter':
-            rangeText = `Mostrando datos del trimestre: días ${currentStartDate} - ${endDate}`;
+            rangeText = `Showing quarterly data: days ${currentStartDate} - ${endDate}`;
             break;
     }
     
@@ -70,7 +70,7 @@ function updateDateRangeInfo() {
     }
 }
 
-// Función para actualizar el visualizador de fechas
+// Function to update the date visualizer
 function updateDateVisualizer() {
     const visualizer = document.getElementById('dateVisualizer');
     if (!visualizer) return;
@@ -80,14 +80,14 @@ function updateDateVisualizer() {
     const periodLength = getPeriodLength();
     const endDate = currentStartDate + periodLength - 1;
     
-    // Crear una cuadrícula de 10 celdas por fila (puedes ajustar esto según prefieras)
+    // Create a grid with 10 cells per row (you can adjust this as preferred)
     const cellsPerRow = 10;
     
-    // Crear contenedores para cada fila
+    // Create containers for each row
     let currentRow;
     
     for (let i = 1; i <= MAX_RUN; i++) {
-        // Crear una nueva fila cada 10 celdas
+        // Create a new row every 10 cells
         if ((i - 1) % cellsPerRow === 0) {
             currentRow = document.createElement('div');
             currentRow.classList.add('date-row');
@@ -99,20 +99,20 @@ function updateDateVisualizer() {
         const dateCell = document.createElement('div');
         dateCell.classList.add('date-cell');
         
-        // Verificar si está en el rango seleccionado
+        // Check if it's in the selected range
         if (i >= currentStartDate && i <= endDate) {
             dateCell.classList.add('active');
         }
         
-        // Agregar número del día
+        // Add day number
         dateCell.textContent = i;
         
-        // Hacer los días clickeables para seleccionar directamente
+        // Make days clickable for direct selection
         dateCell.addEventListener('click', () => {
             if (currentPeriod === 'day') {
                 currentStartDate = i;
             } else {
-                // Para otros períodos, ajustar para que comience en este día
+                // For other periods, adjust to start on this day
                 currentStartDate = i;
                 validateDateRange();
             }
@@ -131,7 +131,7 @@ function updateDateVisualizer() {
     }
 }
 
-// Función para inicializar el escenario de optimización
+// Function to initialize optimization scenario
 function setupOptimizationScenario() {
     const station4FailureRate = document.getElementById('station4FailureRate');
     const failureRateValue = document.getElementById('failureRateValue');
@@ -139,27 +139,27 @@ function setupOptimizationScenario() {
     
     if (!station4FailureRate || !failureRateValue || !simulateOptimizationBtn) return;
     
-    // Actualizar el valor mostrado cuando se cambia el control deslizante
+    // Update displayed value when slider changes
     station4FailureRate.addEventListener('input', () => {
         failureRateValue.textContent = `${station4FailureRate.value}%`;
     });
     
-    // Simular la optimización cuando se hace clic en el botón
+    // Simulate optimization when button is clicked
     simulateOptimizationBtn.addEventListener('click', () => {
         const newFailureRate = parseInt(station4FailureRate.value) / 100;
         simulateOptimization(newFailureRate);
     });
 }
 
-// Función para simular la optimización
+// Function to simulate optimization
 function simulateOptimization(stationId, currentFailureRate, newFailureRate) {
     const optimizationChart = document.getElementById('optimizationChart');
     if (!optimizationChart) return;
     
-    // Limpiar el contenedor
+    // Clear container
     optimizationChart.innerHTML = "";
     
-    // Crear el SVG
+    // Create SVG
     const svg = d3.select(optimizationChart)
         .append("svg")
         .attr("width", "100%")
@@ -167,27 +167,27 @@ function simulateOptimization(stationId, currentFailureRate, newFailureRate) {
         .attr("viewBox", "0 0 800 400")
         .attr("preserveAspectRatio", "xMidYMid meet");
     
-    // Configurar dimensiones y márgenes
+    // Configure dimensions and margins
     const margin = {top: 40, right: 100, bottom: 60, left: 60};
     const width = 800 - margin.left - margin.right;
     const height = 400 - margin.top - margin.bottom;
     
-    // Crear el contenedor principal
+    // Create main container
     const g = svg.append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
     
-    // Simular producción con diferentes tasas de fallo
+    // Simulate production with different failure rates
     const currentData = getCurrentPeriodData();
     if (!currentData || currentData.length === 0) {
         svg.append("text")
             .attr("x", 400)
             .attr("y", 200)
             .attr("text-anchor", "middle")
-            .text("No hay datos disponibles para este período");
+            .text("No data available for this period");
         return;
     }
     
-    // Calcular promedios actuales
+    // Calculate current averages
     let totalProduction = 0;
     let faultyProducts = 0;
     
@@ -196,50 +196,50 @@ function simulateOptimization(stationId, currentFailureRate, newFailureRate) {
         faultyProducts += run.metrics['Faulty Products'] || 0;
     });
     
-    // Estimar la contribución de la estación seleccionada a los fallos totales
-    // Obtenemos las tasas de fallo para todas las estaciones
-    const failureRates = [0.02, 0.01, 0.05, 0.15, 0.07, 0.06]; // Estaciones 1-6
+    // Estimate selected station's contribution to total failures
+    // Get failure rates for all stations
+    const failureRates = [0.02, 0.01, 0.05, 0.15, 0.07, 0.06]; // Stations 1-6
     const totalFailureRate = failureRates.reduce((sum, rate) => sum + rate, 0);
     
-    // Calcular qué porcentaje de los fallos totales proviene de esta estación
+    // Calculate what percentage of total failures comes from this station
     const stationContribution = currentFailureRate / totalFailureRate;
     const stationFaults = faultyProducts * stationContribution;
     
-    // Calcular nuevos fallos basados en la nueva tasa
+    // Calculate new failures based on new rate
     const reductionFactor = newFailureRate / currentFailureRate;
     const newStationFaults = stationFaults * reductionFactor;
     const otherFaults = faultyProducts - stationFaults;
     const newTotalFaults = newStationFaults + otherFaults;
     
-     // Estimar impacto en producción (menos fallos = menos tiempo perdido = más producción)
-    // Factor de conversión: cada fallo evitado permite producir 0.5 unidades adicionales
+     // Estimate impact on production (fewer failures = less wasted time = more production)
+    // Conversion factor: each avoided failure allows producing 0.5 additional units
     const productivityGain = (stationFaults - newStationFaults) * 0.5;
     const newTotalProduction = totalProduction + productivityGain;
 
-    // Crear datos para el gráfico
+    // Create data for chart
     const comparisonData = [
         {
-            scenario: "Actual",
+            scenario: "Current",
             totalProduction: totalProduction,
             faultyProducts: faultyProducts,
             faultyRate: faultyProducts / totalProduction
         },
         {
-            scenario: "Optimizado",
+            scenario: "Optimized",
             totalProduction: newTotalProduction,
             faultyProducts: newTotalFaults,
             faultyRate: newTotalFaults / newTotalProduction
         }
     ];
     
-    // Definir escalas para el gráfico de barras agrupadas
+    // Define scales for grouped bar chart
     const x0 = d3.scaleBand()
         .domain(comparisonData.map(d => d.scenario))
         .range([0, width])
         .padding(0.3);
         
     const x1 = d3.scaleBand()
-        .domain(['Producción Total', 'Productos Defectuosos'])
+        .domain(['Total Production', 'Faulty Products'])
         .range([0, x0.bandwidth()])
         .padding(0.05);
         
@@ -247,12 +247,12 @@ function simulateOptimization(stationId, currentFailureRate, newFailureRate) {
         .domain([0, d3.max(comparisonData, d => d.totalProduction) * 1.1])
         .range([height, 0]);
     
-    // Definir colores
+    // Define colors
     const color = d3.scaleOrdinal()
-        .domain(['Producción Total', 'Productos Defectuosos'])
+        .domain(['Total Production', 'Faulty Products'])
         .range(['#007bff', '#dc3545']);
     
-    // Agregar ejes
+    // Add axes
     g.append("g")
         .attr("transform", `translate(0,${height})`)
         .call(d3.axisBottom(x0));
@@ -260,7 +260,7 @@ function simulateOptimization(stationId, currentFailureRate, newFailureRate) {
     g.append("g")
         .call(d3.axisLeft(y));
     
-    // Crear grupos para cada escenario
+    // Create groups for each scenario
     const scenarioGroups = g.selectAll(".scenario-group")
         .data(comparisonData)
         .enter()
@@ -268,37 +268,37 @@ function simulateOptimization(stationId, currentFailureRate, newFailureRate) {
         .attr("class", "scenario-group")
         .attr("transform", d => `translate(${x0(d.scenario)},0)`);
     
-    // Dibujar barras para producción total
+    // Draw bars for total production
     scenarioGroups.append("rect")
-        .attr("x", x1('Producción Total'))
+        .attr("x", x1('Total Production'))
         .attr("y", d => y(d.totalProduction))
         .attr("width", x1.bandwidth())
         .attr("height", d => height - y(d.totalProduction))
-        .attr("fill", color('Producción Total'));
+        .attr("fill", color('Total Production'));
     
-    // Dibujar barras para productos defectuosos
+    // Draw bars for faulty products
     scenarioGroups.append("rect")
-        .attr("x", x1('Productos Defectuosos'))
+        .attr("x", x1('Faulty Products'))
         .attr("y", d => y(d.faultyProducts))
         .attr("width", x1.bandwidth())
         .attr("height", d => height - y(d.faultyProducts))
-        .attr("fill", color('Productos Defectuosos'));
+        .attr("fill", color('Faulty Products'));
     
-    // Agregar etiquetas con valores
+    // Add value labels
     scenarioGroups.append("text")
-        .attr("x", x1('Producción Total') + x1.bandwidth() / 2)
+        .attr("x", x1('Total Production') + x1.bandwidth() / 2)
         .attr("y", d => y(d.totalProduction) - 5)
         .attr("text-anchor", "middle")
         .text(d => d.totalProduction.toFixed(0));
         
     scenarioGroups.append("text")
-        .attr("x", x1('Productos Defectuosos') + x1.bandwidth() / 2)
+        .attr("x", x1('Faulty Products') + x1.bandwidth() / 2)
         .attr("y", d => y(d.faultyProducts) - 5)
         .attr("text-anchor", "middle")
         .text(d => d.faultyProducts.toFixed(0));
     
-    // Agregar línea para tasa de fallos
-    // Crear una escala Y secundaria para la tasa de fallos
+    // Add line for failure rate
+    // Create secondary Y scale for failure rate
     const y2 = d3.scaleLinear()
         .domain([0, d3.max(comparisonData, d => d.faultyRate) * 1.5])
         .range([height, 0]);
@@ -307,7 +307,7 @@ function simulateOptimization(stationId, currentFailureRate, newFailureRate) {
         .attr("transform", `translate(${width},0)`)
         .call(d3.axisRight(y2).tickFormat(d => (d * 100).toFixed(1) + "%"));
     
-    // Dibujar línea de tasa de fallos
+    // Draw failure rate line
     const line = d3.line()
         .x(d => x0(d.scenario) + x0.bandwidth() / 2)
         .y(d => y2(d.faultyRate));
@@ -329,7 +329,7 @@ function simulateOptimization(stationId, currentFailureRate, newFailureRate) {
         .attr("r", 5)
         .attr("fill", "#ffc107");
     
-    // Agregar etiquetas para tasa de fallos
+    // Add labels for failure rate
     g.selectAll(".rate-label")
         .data(comparisonData)
         .enter()
@@ -342,20 +342,20 @@ function simulateOptimization(stationId, currentFailureRate, newFailureRate) {
         .style("fill", "#ffc107")
         .text(d => (d.faultyRate * 100).toFixed(2) + "%");
     
-    // Agregar título
+    // Add title
     svg.append("text")
         .attr("x", width / 2 + margin.left)
         .attr("y", 20)
         .attr("text-anchor", "middle")
         .style("font-size", "16px")
         .style("font-weight", "bold")
-        .text(`Optimización de Estación ${stationId} (${getStationName(stationId)}): ${(currentFailureRate * 100).toFixed(0)}% → ${(newFailureRate * 100).toFixed(0)}%`);
+        .text(`Station ${stationId} Optimization (${getStationName(stationId)}): ${(currentFailureRate * 100).toFixed(0)}% → ${(newFailureRate * 100).toFixed(0)}%`);
     
-    // Agregar leyenda
+    // Add legend
     const legend = svg.append("g")
         .attr("transform", `translate(${width + margin.left + 20}, ${margin.top + 10})`);
         
-    // Producción total
+    // Total production
     legend.append("rect")
         .attr("x", 0)
         .attr("y", 0)
@@ -368,9 +368,9 @@ function simulateOptimization(stationId, currentFailureRate, newFailureRate) {
         .attr("y", 7.5)
         .attr("dy", "0.35em")
         .style("font-size", "12px")
-        .text("Producción Total");
+        .text("Total Production");
         
-    // Productos defectuosos
+    // Faulty products
     legend.append("rect")
         .attr("x", 0)
         .attr("y", 25)
@@ -383,9 +383,9 @@ function simulateOptimization(stationId, currentFailureRate, newFailureRate) {
         .attr("y", 32.5)
         .attr("dy", "0.35em")
         .style("font-size", "12px")
-        .text("Productos Defectuosos");
+        .text("Faulty Products");
         
-    // Tasa de fallos
+    // Failure rate
     legend.append("line")
         .attr("x1", 0)
         .attr("y1", 57.5)
@@ -399,12 +399,12 @@ function simulateOptimization(stationId, currentFailureRate, newFailureRate) {
         .attr("y", 57.5)
         .attr("dy", "0.35em")
         .style("font-size", "12px")
-        .text("Tasa de Fallos");
+        .text("Failure Rate");
 }
 
-// Función para obtener datos filtrados por el período actual
+// Function to get filtered data for current period
 function getCurrentPeriodData() {
-    // Obtener los datos según el período y fecha seleccionados
+    // Get data according to selected period and date
     const startDate = currentStartDate;
     const endDate = currentStartDate + getPeriodLength() - 1;
     
@@ -417,22 +417,22 @@ function getCurrentPeriodData() {
     });
 }
 
-// Función para actualizar los controles de optimización
+// Function to update optimization controls
 function updateOptimizationControls() {
     const optimizationControls = document.getElementById('optimizationControls');
     if (!optimizationControls) return;
     
-    // Obtener los datos del período actual
+    // Get data for current period
     const data = getCurrentPeriodData();
     if (!data || data.length === 0) {
-        optimizationControls.innerHTML = '<div class="alert alert-warning">No hay datos disponibles para este período</div>';
+        optimizationControls.innerHTML = '<div class="alert alert-warning">No data available for this period</div>';
         return;
     }
     
-    // Calcular tiempos de inactividad promedio por estación
+    // Calculate average downtime by station
     const stationDowntimes = [];
-    // También almacenar las tasas de fallo por estación
-    const failureRates = [0.02, 0.01, 0.05, 0.15, 0.07, 0.06]; // tasas de fallo de estaciones 1-6
+    // Also store failure rates by station
+    const failureRates = [0.02, 0.01, 0.05, 0.15, 0.07, 0.06]; // failure rates for stations 1-6
     
     for (let i = 1; i <= 6; i++) {
         const downtimes = data.map(run => run.metrics[`Station ${i} Downtime`] || 0);
@@ -446,17 +446,17 @@ function updateOptimizationControls() {
         });
     }
     
-    // Encontrar la estación con mayor tiempo de inactividad
+    // Find station with highest downtime
     stationDowntimes.sort((a, b) => b.downtime - a.downtime);
     const worstStation = stationDowntimes[0];
     
-    // Generar los controles para la estación más problemática
+    // Generate controls for the most problematic station
     optimizationControls.innerHTML = `
         <div class="form-group">
-            <h5>Estación ${worstStation.stationId}: ${worstStation.name}</h5>
-            <p class="text-muted">Tiempo de inactividad: ${worstStation.downtime.toFixed(1)} unidades</p>
-            <p class="text-muted">Tasa de fallos actual: ${(worstStation.failureRate * 100).toFixed(0)}%</p>
-            <label for="station${worstStation.stationId}FailureRate">Tasa de Fallos propuesta:</label>
+            <h5>Station ${worstStation.stationId}: ${worstStation.name}</h5>
+            <p class="text-muted">Downtime: ${worstStation.downtime.toFixed(1)} units</p>
+            <p class="text-muted">Current failure rate: ${(worstStation.failureRate * 100).toFixed(0)}%</p>
+            <label for="station${worstStation.stationId}FailureRate">Proposed Failure Rate:</label>
             <input type="range" class="custom-range" 
                    id="station${worstStation.stationId}FailureRate" 
                    min="1" max="${(worstStation.failureRate * 100).toFixed(0)}" 
@@ -468,11 +468,11 @@ function updateOptimizationControls() {
             </div>
         </div>
         <div class="mt-4">
-            <button id="simulateOptimization" class="btn btn-success btn-block">Simular Mejoras</button>
+            <button id="simulateOptimization" class="btn btn-success btn-block">Simulate Improvements</button>
         </div>
     `;
     
-    // Configurar eventos para el control deslizante y el botón
+    // Set up events for slider and button
     document.getElementById(`station${worstStation.stationId}FailureRate`).addEventListener('input', (e) => {
         document.getElementById('failureRateValue').textContent = `${e.target.value}%`;
     });
@@ -483,10 +483,10 @@ function updateOptimizationControls() {
     });
 }
 
-// Función auxiliar para obtener el nombre de la estación
+// Helper function to get station name
 function getStationName(stationNumber) {
     const stationNames = [
-        "Motherboard", "CPU", "GPU", "Memoria", "Carcasa", "Pantalla"
+        "Motherboard", "CPU", "GPU", "Memory", "Chassis", "Display"
     ];
     return stationNames[stationNumber - 1];
 }

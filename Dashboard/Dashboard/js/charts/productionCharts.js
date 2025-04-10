@@ -13,10 +13,10 @@ class ProductionCharts {
         const container = document.getElementById(containerId);
         if (!container) return;
         
-        // Limpiar el contenedor
+        // Clear previous content
         container.innerHTML = "";
         
-        // Crear el SVG
+        // Create SVG container
         const svg = d3.select(container)
             .append("svg")
             .attr("width", "100%")
@@ -24,13 +24,13 @@ class ProductionCharts {
             .attr("viewBox", "0 0 800 400")
             .attr("preserveAspectRatio", "xMidYMid meet");
             
-        // Guardar referencia al gráfico
+        // Save reference to the chart
         this.charts.productionOverview = {
             svg: svg,
             containerId: containerId
         };
         
-        // Dibujar el gráfico inicial
+        // Initialize chart with empty data
         this.updateProductionOverview();
     }
     
@@ -45,29 +45,29 @@ class ProductionCharts {
         const svg = this.charts.productionOverview.svg;
         svg.selectAll("*").remove();
         
-        // Obtener datos filtrados según el período actual
+        // Obtain data for the current period
         const data = this.getCurrentPeriodData();
         
-        // Comprobar si hay datos
+        // Check if data is available
         if (!data || data.length === 0) {
             svg.append("text")
                 .attr("x", 400)
                 .attr("y", 200)
                 .attr("text-anchor", "middle")
-                .text("No hay datos disponibles para este período");
+                .text("No data available for this period");
             return;
         }
         
-        // Configurar dimensiones y márgenes
+        // Configure SVG dimensions and margins
         const margin = {top: 40, right: 30, bottom: 60, left: 60};
         const width = 800 - margin.left - margin.right;
         const height = 400 - margin.top - margin.bottom;
         
-        // Crear el contenedor principal con los márgenes
+        // Create group element for the chart
         const g = svg.append("g")
             .attr("transform", `translate(${margin.left},${margin.top})`);
         
-        // Procesar datos
+        // Process data for the chart
         const productionData = data.map(run => {
             return {
                 run: run.run,
@@ -77,7 +77,7 @@ class ProductionCharts {
             };
         });
         
-        // Definir escalas
+        // Define scales
         const x = d3.scaleBand()
             .domain(productionData.map(d => d.run))
             .range([0, width])
@@ -91,7 +91,7 @@ class ProductionCharts {
             .domain([0, d3.max(productionData, d => d.faultyRate) * 1.5])
             .range([height, 0]);
         
-        // Agregar ejes
+        // Add axes
         g.append("g")
             .attr("transform", `translate(0,${height})`)
             .call(d3.axisBottom(x))
@@ -106,7 +106,7 @@ class ProductionCharts {
             .attr("transform", `translate(${width},0)`)
             .call(d3.axisRight(y2).ticks(5, "%"));
         
-        // Dibujar barras para producción total
+        // Draw bars for total production
         g.selectAll(".bar-total")
             .data(productionData)
             .enter()
@@ -118,7 +118,7 @@ class ProductionCharts {
             .attr("height", d => height - y(d.totalProduction))
             .attr("fill", "#007bff");
         
-        // Dibujar barras para productos defectuosos
+        // Draw bars for faulty products
         g.selectAll(".bar-faulty")
             .data(productionData)
             .enter()
@@ -130,7 +130,7 @@ class ProductionCharts {
             .attr("height", d => height - y(d.faultyProducts))
             .attr("fill", "#dc3545");
         
-        // Dibujar línea para tasa de fallos
+        // Draw line for faulty rate
         const line = d3.line()
             .x(d => x(d.run) + x.bandwidth() / 2)
             .y(d => y2(d.faultyRate));
@@ -142,7 +142,7 @@ class ProductionCharts {
             .attr("stroke-width", 3)
             .attr("d", line);
             
-        // Agregar círculos en los puntos de datos de la línea
+        // Add dots for faulty rate
         g.selectAll(".dot")
             .data(productionData)
             .enter()
@@ -153,20 +153,20 @@ class ProductionCharts {
             .attr("r", 4)
             .attr("fill", "#ffc107");
         
-        // Agregar títulos y leyendas
+        // Add labels for axes
         svg.append("text")
             .attr("x", width / 2 + margin.left)
             .attr("y", 20)
             .attr("text-anchor", "middle")
             .style("font-size", "16px")
             .style("font-weight", "bold")
-            .text("Producción y Fallos por Día");
+            .text("Production and Faulty Products Overview");
             
-        // Leyenda
+        // Legend
         const legend = svg.append("g")
             .attr("transform", `translate(${width - 120 + margin.left}, ${margin.top})`);
             
-        // Producción total
+        // Total production
         legend.append("rect")
             .attr("x", 0)
             .attr("y", 0)
@@ -179,9 +179,9 @@ class ProductionCharts {
             .attr("y", 7.5)
             .attr("dy", "0.35em")
             .style("font-size", "12px")
-            .text("Producción Total");
+            .text("Total Production");
             
-        // Productos defectuosos
+        // Faulty products
         legend.append("rect")
             .attr("x", 0)
             .attr("y", 25)
@@ -194,9 +194,9 @@ class ProductionCharts {
             .attr("y", 32.5)
             .attr("dy", "0.35em")
             .style("font-size", "12px")
-            .text("Defectuosos");
+            .text("Faulty Products");
             
-        // Tasa de fallos
+        // Faulty rate
         legend.append("line")
             .attr("x1", 0)
             .attr("y1", 57.5)
@@ -210,11 +210,11 @@ class ProductionCharts {
             .attr("y", 57.5)
             .attr("dy", "0.35em")
             .style("font-size", "12px")
-            .text("Tasa de Fallos");
+            .text("Faulty Rate");
     }
     
     updateKPIs() {
-        // Obtener datos para el período actual
+        // Obtain data for the current period
         const data = this.getCurrentPeriodData();
         
         if (!data || data.length === 0) {
@@ -224,7 +224,7 @@ class ProductionCharts {
             return;
         }
         
-        // Calcular promedios para los KPIs
+        // Calculate KPIs
         let totalProduction = 0;
         let faultyProducts = 0;
         let totalRate = 0;
@@ -237,14 +237,14 @@ class ProductionCharts {
         
         const avgRate = totalRate / data.length;
         
-        // Actualizar KPIs
+        // Update KPIs
         document.getElementById('totalProductionKPI').textContent = totalProduction.toFixed(0);
         document.getElementById('faultyProductsKPI').textContent = faultyProducts.toFixed(0);
         document.getElementById('faultyRateKPI').textContent = (avgRate * 100).toFixed(2) + "%";
     }
     
     getCurrentPeriodData() {
-        // Obtener los datos según el período y fecha seleccionados
+        // Retrieve the data according to the selected period and date
         const period = currentPeriod;
         const startDate = currentStartDate;
         const endDate = currentStartDate + getPeriodLength() - 1;

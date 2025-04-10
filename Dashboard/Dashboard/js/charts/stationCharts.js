@@ -14,10 +14,10 @@ class StationCharts {
         const container = document.getElementById(containerId);
         if (!container) return;
         
-        // Limpiar el contenedor
+        // Clear previous content
         container.innerHTML = "";
         
-        // Crear el SVG
+        // Create SVG container
         const svg = d3.select(container)
             .append("svg")
             .attr("width", "100%")
@@ -25,13 +25,13 @@ class StationCharts {
             .attr("viewBox", "0 0 700 400")
             .attr("preserveAspectRatio", "xMidYMid meet");
             
-        // Guardar referencia al gráfico
+        // Save reference to the chart
         this.charts.occupancyChart = {
             svg: svg,
             containerId: containerId
         };
         
-        // Dibujar el gráfico inicial
+        // Draw initial chart
         this.updateOccupancyChart();
     }
     
@@ -39,10 +39,10 @@ class StationCharts {
         const container = document.getElementById(containerId);
         if (!container) return;
         
-        // Limpiar el contenedor
+        // Clear the container
         container.innerHTML = "";
         
-        // Crear el SVG
+        // Create SVG container
         const svg = d3.select(container)
             .append("svg")
             .attr("width", "100%")
@@ -50,13 +50,13 @@ class StationCharts {
             .attr("viewBox", "0 0 700 400")
             .attr("preserveAspectRatio", "xMidYMid meet");
             
-        // Guardar referencia al gráfico
+        // Save reference to the chart
         this.charts.downtimeChart = {
             svg: svg,
             containerId: containerId
         };
         
-        // Dibujar el gráfico inicial
+        // Draw initial chart
         this.updateDowntimeChart();
     }
     
@@ -64,10 +64,10 @@ class StationCharts {
         const container = document.getElementById(containerId);
         if (!container) return;
         
-        // Limpiar el contenedor
+        // Clear previous content
         container.innerHTML = "";
         
-        // Crear el SVG
+        // Create SVG container
         const svg = d3.select(container)
             .append("svg")
             .attr("width", "100%")
@@ -75,13 +75,13 @@ class StationCharts {
             .attr("viewBox", "0 0 800 400")
             .attr("preserveAspectRatio", "xMidYMid meet");
             
-        // Guardar referencia al gráfico
+        // Save reference to the chart
         this.charts.bottleneckChart = {
             svg: svg,
             containerId: containerId
         };
         
-        // Dibujar el gráfico inicial
+        // Draw initial chart
         this.updateBottleneckVisualization();
     }
     
@@ -97,42 +97,42 @@ class StationCharts {
         const svg = this.charts.occupancyChart.svg;
         svg.selectAll("*").remove();
         
-        // Obtener datos filtrados para el período actual
+        // Get filtered data for the current period
         const data = this.getCurrentPeriodData();
         
-        // Comprobar si hay datos
+        // Check if there is data
         if (!data || data.length === 0) {
             svg.append("text")
                 .attr("x", 350)
                 .attr("y", 200)
                 .attr("text-anchor", "middle")
-                .text("No hay datos disponibles para este período");
+                .text("No data available for this period");
             return;
         }
         
-        // Calcular tasas de ocupación promedio por estación
+        // Calculate average occupancy rates by station
         const stationData = [];
         for (let i = 1; i <= 6; i++) {
             const occupancyRates = data.map(run => run.metrics[`Station ${i} Occupancy Rate`] || 0);
             const avgOccupancy = occupancyRates.reduce((sum, rate) => sum + rate, 0) / occupancyRates.length;
             
             stationData.push({
-                station: `Estación ${i}`,
+                station: `Station ${i}`,
                 stationNumber: i,
                 occupancyRate: avgOccupancy
             });
         }
         
-        // Configurar dimensiones y márgenes
+        // Configure dimensions and margins
         const margin = { top: 40, right: 30, bottom: 60, left: 70 };
         const width = 700 - margin.left - margin.right;
         const height = 400 - margin.top - margin.bottom;
         
-        // Crear el contenedor principal
+        // Create the main container
         const g = svg.append("g")
             .attr("transform", `translate(${margin.left},${margin.top})`);
         
-        // Definir escalas
+        // Define scales
         const x = d3.scaleBand()
             .domain(stationData.map(d => d.station))
             .range([0, width])
@@ -142,7 +142,7 @@ class StationCharts {
             .domain([0, Math.max(d3.max(stationData, d => d.occupancyRate) * 1.1, 0.2)])
             .range([height, 0]);
         
-        // Agregar ejes
+        // Add axes
         g.append("g")
             .attr("transform", `translate(0,${height})`)
             .call(d3.axisBottom(x));
@@ -150,16 +150,16 @@ class StationCharts {
         g.append("g")
             .call(d3.axisLeft(y).tickFormat(d => (d * 100).toFixed(0) + "%"));
         
-        // Encontrar valores min y max para la escala de colores
+        // Find min and max values for the color scale
         const minOccupancy = d3.min(stationData, d => d.occupancyRate);
         const maxOccupancy = d3.max(stationData, d => d.occupancyRate);
         const avgOccupancy = d3.mean(stationData, d => d.occupancyRate);
         
-        // Determinar si hay variación significativa en las tasas de ocupación
+        // Determine if there is a significant variation in occupancy rates
         const occupancyVariation = maxOccupancy - minOccupancy;
-        const significantVariation = occupancyVariation > avgOccupancy * 0.1; // 10% del promedio
+        const significantVariation = occupancyVariation > avgOccupancy * 0.1; // 10% of the average
     
-        // Dibujar barras
+        // Draw bars
         g.selectAll(".bar")
             .data(stationData)
             .enter()
@@ -170,23 +170,23 @@ class StationCharts {
             .attr("width", x.bandwidth())
             .attr("height", d => height - y(d.occupancyRate))
             .attr("fill", d => {
-                // Si no hay variación significativa, usar un color base
+                // If there is no significant variation, use a base color
                 if (!significantVariation) return "#007bff";
                 
-                // Asignar colores según la tasa de ocupación relativa
-                // Si la tasa es cercana al máximo, es bueno (azul)
-                // Si es baja comparada con el máximo, podría indicar un problema (rojo/naranja)
+                // Assign colors based on the relative occupancy rate.
+                // If the rate is close to the maximum, it is good (blue
+                // If it is low compared to the maximum, it may indicate a problem (red/orange)
                 const ratio = (d.occupancyRate - minOccupancy) / (maxOccupancy - minOccupancy);
                 
-                if (ratio > 0.8) return "#007bff"; // Bueno - azul
-                if (ratio > 0.6) return "#17a2b8"; // Aceptable - cyan
-                if (ratio > 0.4) return "#ffc107"; // Precaución - amarillo
-                if (ratio > 0.2) return "#fd7e14"; // Preocupante - naranja
-                return "#dc3545"; // Crítico - rojo
+                if (ratio > 0.8) return "#007bff"; // Good - blue
+                if (ratio > 0.6) return "#17a2b8"; // Acceptable - cyan
+                if (ratio > 0.4) return "#ffc107"; // Caution - yellow
+                if (ratio > 0.2) return "#fd7e14"; // Concerning - orange
+                return "#dc3545"; // Critical - red
             })
             .attr("opacity", 0.7);
         
-        // Agregar etiquetas de porcentaje
+        // Add percentage labels
         g.selectAll(".label")
             .data(stationData)
             .enter()
@@ -197,35 +197,35 @@ class StationCharts {
             .attr("text-anchor", "middle")
             .text(d => (d.occupancyRate * 100).toFixed(1) + "%");
         
-        // Agregar título
+        // Add title
         svg.append("text")
             .attr("x", width / 2 + margin.left)
             .attr("y", 20)
             .attr("text-anchor", "middle")
             .style("font-size", "16px")
             .style("font-weight", "bold")
-            .text("Tasa de Ocupación por Estación");
+            .text("Occupancy Rate by Station");
             
-        // Agregar título del eje Y
+        // Add Y-axis title
         svg.append("text")
             .attr("transform", "rotate(-90)")
             .attr("x", -(height / 2) - margin.top)
             .attr("y", 20)
             .attr("text-anchor", "middle")
             .style("font-size", "14px")
-            .text("Tasa de Ocupación (%)");
+            .text("Occupancy Rate (%)");
         
-        // Agregar leyenda si hay variación significativa
+        // Add a legend if there is significant variation
         if (significantVariation) {
             const legend = svg.append("g")
                 .attr("transform", `translate(${width - 100 + margin.left}, ${margin.top})`);
                 
             const legendItems = [
-                { color: "#007bff", label: "Excelente" },
-                { color: "#17a2b8", label: "Bueno" },
-                { color: "#ffc107", label: "Regular" },
-                { color: "#fd7e14", label: "Bajo" },
-                { color: "#dc3545", label: "Crítico" }
+                { color: "#007bff", label: "Excellent" },
+                { color: "#17a2b8", label: "Good" },
+                { color: "#ffc107", label: "Fair" },
+                { color: "#fd7e14", label: "Low" },
+                { color: "#dc3545", label: "Critical" }
             ];
             
             legendItems.forEach((item, i) => {
@@ -252,42 +252,42 @@ class StationCharts {
         const svg = this.charts.downtimeChart.svg;
         svg.selectAll("*").remove();
         
-        // Obtener datos filtrados para el período actual
+        // Obtain filtered data for the current period
         const data = this.getCurrentPeriodData();
         
-        // Comprobar si hay datos
+        // Check if there is data
         if (!data || data.length === 0) {
             svg.append("text")
                 .attr("x", 350)
                 .attr("y", 200)
                 .attr("text-anchor", "middle")
-                .text("No hay datos disponibles para este período");
+                .text("No data available for this period");
             return;
         }
         
-        // Calcular tiempos de inactividad promedio por estación
+        // Calculate average downtime by station
         const stationData = [];
         for (let i = 1; i <= 6; i++) {
             const downtimes = data.map(run => run.metrics[`Station ${i} Downtime`] || 0);
             const avgDowntime = downtimes.reduce((sum, time) => sum + time, 0) / downtimes.length;
             
             stationData.push({
-                station: `Estación ${i}`,
+                station: `Station ${i}`,
                 stationNumber: i,
                 downtime: avgDowntime
             });
         }
         
-        // Configurar dimensiones y márgenes
+        // Configure dimensions and margins
         const margin = { top: 40, right: 30, bottom: 60, left: 70 };
         const width = 700 - margin.left - margin.right;
         const height = 400 - margin.top - margin.bottom;
         
-        // Crear el contenedor principal
+        // Create the main container
         const g = svg.append("g")
             .attr("transform", `translate(${margin.left},${margin.top})`);
         
-        // Definir escalas
+        // Define scales
         const x = d3.scaleBand()
             .domain(stationData.map(d => d.station))
             .range([0, width])
@@ -297,7 +297,7 @@ class StationCharts {
             .domain([0, d3.max(stationData, d => d.downtime) * 1.1])
             .range([height, 0]);
         
-        // Agregar ejes
+        // Add axes
         g.append("g")
             .attr("transform", `translate(0,${height})`)
             .call(d3.axisBottom(x));
@@ -305,10 +305,10 @@ class StationCharts {
         g.append("g")
             .call(d3.axisLeft(y));
         
-        // Encontrar el máximo downtime para escalar los colores
+        // Find the maximum downtime to scale the colors
         const maxDowntime = d3.max(stationData, d => d.downtime);
         
-        // Dibujar barras
+        // Draw bars
         g.selectAll(".bar")
             .data(stationData)
             .enter()
@@ -319,18 +319,18 @@ class StationCharts {
             .attr("width", x.bandwidth())
             .attr("height", d => height - y(d.downtime))
             .attr("fill", d => {
-                // Asignar colores según la proporción del tiempo de inactividad
+                // Assign colors based on the proportion of downtime
                 const ratio = d.downtime / maxDowntime;
                 
-                if (ratio >= 0.8) return "#dc3545"; // Crítico (rojo)
-                if (ratio >= 0.6) return "#fd7e14"; // Alto (naranja)
-                if (ratio >= 0.3) return "#ffc107"; // Medio (amarillo)
-                if (ratio >= 0.1) return "#6c757d"; // Bajo (gris)
-                return "#28a745"; // Muy bajo (verde)
+                if (ratio >= 0.8) return "#dc3545"; // Critical (red)
+                if (ratio >= 0.6) return "#fd7e14"; // High (orange)
+                if (ratio >= 0.3) return "#ffc107"; // Medium (yellow)
+                if (ratio >= 0.1) return "#6c757d"; // Low (gray)
+                return "#28a745"; // Very Low (green)
             })
             .attr("opacity", 0.8);
         
-        // Agregar etiquetas
+        // Add labels
         g.selectAll(".label")
             .data(stationData)
             .enter()
@@ -341,34 +341,34 @@ class StationCharts {
             .attr("text-anchor", "middle")
             .text(d => d.downtime.toFixed(1));
         
-        // Agregar título
+        // Add title
         svg.append("text")
             .attr("x", width / 2 + margin.left)
             .attr("y", 20)
             .attr("text-anchor", "middle")
             .style("font-size", "16px")
             .style("font-weight", "bold")
-            .text("Tiempo de Inactividad por Estación");
+            .text("Downtime by Station");
             
-        // Agregar título del eje Y
+        // Add Y-axis title
         svg.append("text")
             .attr("transform", "rotate(-90)")
             .attr("x", -(height / 2) - margin.top)
             .attr("y", 20)
             .attr("text-anchor", "middle")
             .style("font-size", "14px")
-            .text("Tiempo de Inactividad (unidades)");
+            .text("Downtime (units)");
         
-        // Agregar leyenda
+        // Add legend
     const legend = svg.append("g")
         .attr("transform", `translate(${width - 100 + margin.left}, ${margin.top})`);
         
     const legendItems = [
-        { color: "#dc3545", label: "Crítico" },
-        { color: "#fd7e14", label: "Alto" },
-        { color: "#ffc107", label: "Medio" },
-        { color: "#6c757d", label: "Bajo" },
-        { color: "#28a745", label: "Mínimo" }
+        { color: "#dc3545", label: "Critical" },
+        { color: "#fd7e14", label: "High" },
+        { color: "#ffc107", label: "Medium" },
+        { color: "#6c757d", label: "Low" },
+        { color: "#28a745", label: "Minimum" }
     ];
     
     legendItems.forEach((item, i) => {
@@ -394,34 +394,34 @@ class StationCharts {
         const svg = this.charts.bottleneckChart.svg;
         svg.selectAll("*").remove();
         
-        // Obtener datos filtrados para el período actual
+        // Obtain filtered data for the current period
         const data = this.getCurrentPeriodData();
         
-        // Comprobar si hay datos
+        // Check if there is data
         if (!data || data.length === 0) {
             svg.append("text")
                 .attr("x", 400)
                 .attr("y", 200)
                 .attr("text-anchor", "middle")
-                .text("No hay datos disponibles para este período");
+                .text("No data available for this period");
             return;
         }
         
-        // Configurar dimensiones y márgenes
+        // Configure dimensions and margins
         const margin = { top: 40, right: 30, bottom: 60, left: 70 };
         const width = 800 - margin.left - margin.right;
         const height = 400 - margin.top - margin.bottom;
         
-        // Crear el contenedor principal
+        // Create the main container
         const g = svg.append("g")
             .attr("transform", `translate(${margin.left},${margin.top})`);
         
-        // Calcular métricas para cada estación
+        // Calculate metrics for each station
         const stationData = [];
         let totalDowntime = 0;
 
-        // También rastrear las tasas de fallo por estación
-        const failureRates = [0.02, 0.01, 0.05, 0.15, 0.07, 0.06]; // tasas de fallo de estaciones 1-6
+        // Also track failure rates by station.
+        const failureRates = [0.02, 0.01, 0.05, 0.15, 0.07, 0.06]; // failure rates for stations 1-6
         
         for (let i = 1; i <= 6; i++) {
             const downtimes = data.map(run => run.metrics[`Station ${i} Downtime`] || 0);
@@ -429,61 +429,61 @@ class StationCharts {
             totalDowntime += avgDowntime;
             
             stationData.push({
-                station: `Estación ${i}`,
+                station: `Station ${i}`,
                 stationNumber: i,
                 downtime: avgDowntime,
-                failureRate: failureRates[i - 1] // Tasa de fallo
+                failureRate: failureRates[i - 1] // failure rate for the station
             });
         }
         
-        // Calcular porcentaje de tiempo de inactividad para cada estación
+        // Calculate downtime percentage for each station
         stationData.forEach(station => {
             station.percentage = totalDowntime > 0 ? station.downtime / totalDowntime : 0;
         });
         
-        // Ordenar estaciones por tiempo de inactividad (mayor a menor)
+        // Sort stations by downtime (highest to lowest)
         stationData.sort((a, b) => b.downtime - a.downtime);
 
         
-        // Definir posiciones X para cada estación
+        // Define X positions for each station
         const xPositions = {
-            "Estación 1": 0,
-            "Estación 2": width / 5,
-            "Estación 3": 2 * width / 5,
-            "Estación 4": 3 * width / 5,
-            "Estación 5": 4 * width / 5,
-            "Estación 6": width
+            "Station 1": 0,
+            "Station 2": width / 5,
+            "Station 3": 2 * width / 5,
+            "Station 4": 3 * width / 5,
+            "Station 5": 4 * width / 5,
+            "Station 6": width
         };
         
-        // Determinar altura máxima para la visualización
+        // Determine maximum height for visualization
         const maxNodeHeight = height * 0.8;
         
-        // Calcular altura para cada estación basada en su tiempo de inactividad
+        // Calculate height for each station based on its downtime
         const maxDowntime = d3.max(stationData, d => d.downtime);
         
-        //Asignar colores basados en la proporción de downtime
+        // Assign colors based on the proportion of downtime
         stationData.forEach(station => {
             const downtimeRatio = station.downtime / maxDowntime;
             
             if (downtimeRatio >= 0.8) {
-                station.color = "#dc3545"; // Crítico (rojo)
-                station.criticality = "Crítico";
+                station.color = "#dc3545"; // Critical (red)
+                station.criticality = "Critical";
             } else if (downtimeRatio >= 0.5) {
-                station.color = "#fd7e14"; // Alto (naranja)
-                station.criticality = "Alto";
+                station.color = "#fd7e14"; // High (orange)
+                station.criticality = "High";
             } else if (downtimeRatio >= 0.25) {
-                station.color = "#ffc107"; // Medio (amarillo)
-                station.criticality = "Medio";
+                station.color = "#ffc107"; // Medium (yellow)
+                station.criticality = "Medium";
             } else {
-                station.color = "#6c757d"; // Normal (gris)
+                station.color = "#6c757d"; // Normal (gray)
                 station.criticality = "Normal";
             }
         });
     
-        // Actualizar la sección de "Problemas Identificados" con datos reales
+        // Update the "Identified Issues" section with real data
         this.updateBottleneckInsights(stationData);
 
-        // Dibujar flujo del proceso
+        // Draw process flow
         g.append("rect")
             .attr("x", 0)
             .attr("y", height / 2 - 10)
@@ -491,12 +491,12 @@ class StationCharts {
             .attr("height", 20)
             .attr("fill", "#e9ecef");
         
-        // Dibujar nodos de estación
+        // Draw nodes for each station
         stationData.forEach((station, i) => {
             const xPos = xPositions[station.station];
             const nodeHeight = Math.max(maxNodeHeight * (station.downtime / maxDowntime), 30);
             
-            // Dibujar nodo
+            // Draw node
             g.append("rect")
                 .attr("x", xPos - 30)
                 .attr("y", height / 2 - nodeHeight / 2)
@@ -507,7 +507,7 @@ class StationCharts {
                 .attr("rx", 5)
                 .attr("ry", 5);
             
-            // Agregar etiqueta de estación
+            // Add label for the station
             g.append("text")
                 .attr("x", xPos)
                 .attr("y", height / 2 + nodeHeight / 2 + 20)
@@ -516,7 +516,7 @@ class StationCharts {
                 .style("font-weight", station.stationNumber === 4 ? "bold" : "normal")
                 .text(station.station);
             
-            // Agregar etiqueta de tiempo de inactividad
+            // Add label for downtime
             g.append("text")
                 .attr("x", xPos)
                 .attr("y", height / 2)
@@ -526,7 +526,7 @@ class StationCharts {
                 .style("font-weight", "bold")
                 .text(station.downtime.toFixed(1));
             
-            // Agregar etiqueta de porcentaje
+            // Add label for percentage
             g.append("text")
                 .attr("x", xPos)
                 .attr("y", height / 2 + 15)
@@ -536,16 +536,16 @@ class StationCharts {
                 .text((station.percentage * 100).toFixed(0) + "%");
         });
         
-        // Agregar título
+        // Add title
         svg.append("text")
             .attr("x", width / 2 + margin.left)
             .attr("y", 20)
             .attr("text-anchor", "middle")
             .style("font-size", "16px")
             .style("font-weight", "bold")
-            .text("Visualización de Cuellos de Botella en el Proceso");
+            .text("Bottleneck Visualization in the Process");
             
-        // Agregar leyenda
+        // Add legend
         const legend = svg.append("g")
             .attr("transform", `translate(${width - 200 + margin.left}, ${margin.top})`);
             
@@ -561,7 +561,7 @@ class StationCharts {
             .attr("y", 7.5)
             .attr("dy", "0.35em")
             .style("font-size", "12px")
-            .text("Crítico");
+            .text("Critical");
             
         legend.append("rect")
             .attr("x", 0)
@@ -575,7 +575,7 @@ class StationCharts {
             .attr("y", 32.5)
             .attr("dy", "0.35em")
             .style("font-size", "12px")
-            .text("Alto");
+            .text("High");
             
         legend.append("rect")
             .attr("x", 0)
@@ -589,7 +589,7 @@ class StationCharts {
             .attr("y", 57.5)
             .attr("dy", "0.35em")
             .style("font-size", "12px")
-            .text("Medio");
+            .text("Medium");
             
         legend.append("rect")
             .attr("x", 0)
@@ -606,57 +606,57 @@ class StationCharts {
             .text("Normal");
     }
 
-    //función para actualizar los insights
+    //Function to update the bottleneck insights section
     updateBottleneckInsights(stationData) {
         const bottleneckInsights = document.getElementById('bottleneckInsights');
         if (!bottleneckInsights) return;
         
-        // Ordenar estaciones por downtime (descendente)
+        // Sort stations by downtime (descending)
         const sortedByDowntime = [...stationData].sort((a, b) => b.downtime - a.downtime);
         
-        // La estación con mayor downtime
+        // The station with the highest downtime
         const worstStation = sortedByDowntime[0];
         
-        // Calcular el porcentaje total de productos defectuosos causados por esta estación
-        // Usamos la proporción entre su tasa de fallo y la suma total de tasas de fallo
+        // Calculate the total percentage of defective products caused by this station
+        // Use the ratio between its failure rate and the total sum of failure rates
         const totalFailureRate = stationData.reduce((sum, station) => sum + station.failureRate, 0);
         const failureContribution = worstStation.failureRate / totalFailureRate * 100;
         
-        // Crear el texto HTML para los insights
+        // Create the HTML text for the insights
         let insightsHTML = `
-            <p><strong>Estación ${worstStation.stationNumber} (${this.getStationName(worstStation.stationNumber)}):</strong> 
-            Esta estación tiene la mayor tasa de fallos (${(worstStation.failureRate * 100).toFixed(0)}%) 
-            y el mayor tiempo de inactividad (${worstStation.downtime.toFixed(1)} unidades).</p>
-            <p><strong>Impacto:</strong> Esto causa aproximadamente el ${failureContribution.toFixed(0)}% 
-            del total de productos defectuosos.</p>
+            <p><strong>Station ${worstStation.stationNumber} (${this.getStationName(worstStation.stationNumber)}):</strong> 
+            This station has the highest failure rate (${(worstStation.failureRate * 100).toFixed(0)}%) 
+            and the highest downtime (${worstStation.downtime.toFixed(1)} units).</p>
+            <p><strong>Impact:</strong> This causes approximately ${failureContribution.toFixed(0)}% 
+            of the total faulty products.</p>
         `;
         
-        // Si hay una segunda estación problemática, mencionarla también
+        // If there is a second problematic station, mention it as well
         const maxDowntime = d3.max(stationData, d => d.downtime);
         if (sortedByDowntime.length > 1 && sortedByDowntime[1].downtime > maxDowntime * 0.5) {
             const secondWorstStation = sortedByDowntime[1];
             const secondFailureContribution = secondWorstStation.failureRate / totalFailureRate * 100;
             
             insightsHTML += `
-                <p><strong>Estación ${secondWorstStation.stationNumber} (${this.getStationName(secondWorstStation.stationNumber)}):</strong> 
-                También presenta problemas significativos con una tasa de fallos del ${(secondWorstStation.failureRate * 100).toFixed(0)}% 
-                y un tiempo de inactividad de ${secondWorstStation.downtime.toFixed(1)} unidades (${secondFailureContribution.toFixed(0)}% de los defectos).</p>
+                <p><strong>Station ${secondWorstStation.stationNumber} (${this.getStationName(secondWorstStation.stationNumber)}):</strong> 
+                Also shows significant issues with a failure rate of ${(secondWorstStation.failureRate * 100).toFixed(0)}% 
+                and a downtime of ${secondWorstStation.downtime.toFixed(1)} units (${secondFailureContribution.toFixed(0)}% of defects).</p>
             `;
         }
         
-        // Actualizar el contenido
+        // Update the content
         bottleneckInsights.innerHTML = insightsHTML;
     }
 
-    // Función auxiliar para obtener el nombre de la estación
+    // Helper function to get the station name
     getStationName(stationNumber) {
         const stationNames = [
-            "Motherboard", "CPU", "GPU", "Memoria", "Carcasa", "Pantalla"
+            "Motherboard", "CPU", "GPU", "Memory", "Chassis", "Display"
         ];
         return stationNames[stationNumber - 1];
     }
     getCurrentPeriodData() {
-        // Obtener los datos según el período y fecha seleccionados
+        // Get the data according to the selected period and date
         const period = currentPeriod;
         const startDate = currentStartDate;
         const endDate = currentStartDate + getPeriodLength() - 1;

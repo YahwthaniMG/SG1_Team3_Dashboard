@@ -14,7 +14,7 @@ class DataProcessor {
             const response = await fetch('http://localhost:5000/get-simulation-results');
             
             if (!response.ok) {
-                throw new Error(`Error HTTP: ${response.status}`);
+                throw new Error(`HTTP error: ${response.status}`);
             }
             
             const data = await response.json();
@@ -24,12 +24,12 @@ class DataProcessor {
                 this.processData();
                 return this.processedData;
             } else {
-                console.error("Error al cargar los datos:", data.error);
+                console.error("Error loading data:", data.error);
                 return null;
             }
         } catch (error) {
-            console.error("Error al cargar los resultados:", error);
-            // Generar datos de prueba en caso de error
+            console.error("Error loading results:", error);
+            // Generate test data in case of error
             this.generateTestData();
             this.processData();
             return this.processedData;
@@ -41,13 +41,13 @@ class DataProcessor {
             return;
         }
         
-        // Procesar datos de producción
+        // Process production data
         this.processProductionData();
         
-        // Procesar datos de estaciones
+        // Process station data
         this.processStationData();
         
-        // Procesar datos de tiempo
+        // Process time data
         this.processTimeData();
     }
 
@@ -135,14 +135,14 @@ class DataProcessor {
             return null;
         }
         
-        // Filtrar los runs que están dentro del rango seleccionado
+        // Filter runs within the selected range
         return this.simulationData.runs.filter(run => {
             return run.run >= startDate && run.run <= endDate;
         });
     }
 
     generateTestData() {
-        // Datos de prueba para desarrollo
+        // Test data for development
         this.simulationData = {
             success: true,
             runs: Array.from({ length: 100 }, (_, i) => {
@@ -180,5 +180,5 @@ class DataProcessor {
     }
 }
 
-// Crear instancia global
+// Create global instance
 const dataProcessor = new DataProcessor();

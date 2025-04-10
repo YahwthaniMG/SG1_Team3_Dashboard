@@ -13,10 +13,10 @@ class TimeCharts {
         const container = document.getElementById(containerId);
         if (!container) return;
         
-        // Limpiar el contenedor
+        // Clear the container
         container.innerHTML = "";
         
-        // Crear el SVG
+        // Create the SVG
         const svg = d3.select(container)
             .append("svg")
             .attr("width", "100%")
@@ -24,13 +24,13 @@ class TimeCharts {
             .attr("viewBox", "0 0 700 400")
             .attr("preserveAspectRatio", "xMidYMid meet");
             
-        // Guardar referencia al gráfico
+        // Save chart reference
         this.charts.productionTimeChart = {
             svg: svg,
             containerId: containerId
         };
         
-        // Dibujar el gráfico inicial
+        // Draw initial chart
         this.updateProductionTimeChart();
     }
     
@@ -38,10 +38,10 @@ class TimeCharts {
         const container = document.getElementById(containerId);
         if (!container) return;
         
-        // Limpiar el contenedor
+        // Clear the container
         container.innerHTML = "";
         
-        // Crear el SVG
+        // Create the SVG
         const svg = d3.select(container)
             .append("svg")
             .attr("width", "100%")
@@ -49,13 +49,13 @@ class TimeCharts {
             .attr("viewBox", "0 0 700 400")
             .attr("preserveAspectRatio", "xMidYMid meet");
             
-        // Guardar referencia al gráfico
+        // Save chart reference
         this.charts.fixingTimeChart = {
             svg: svg,
             containerId: containerId
         };
         
-        // Dibujar el gráfico inicial
+        // Draw initial chart
         this.updateFixingTimeChart();
     }
     
@@ -70,35 +70,35 @@ class TimeCharts {
         const svg = this.charts.productionTimeChart.svg;
         svg.selectAll("*").remove();
         
-        // Obtener datos filtrados para el período actual
+        // Get filtered data for current period
         const data = this.getCurrentPeriodData();
         
-        // Comprobar si hay datos
+        // Check if there is data
         if (!data || data.length === 0) {
             svg.append("text")
                 .attr("x", 350)
                 .attr("y", 200)
                 .attr("text-anchor", "middle")
-                .text("No hay datos disponibles para este período");
+                .text("No data available for this period");
             return;
         }
         
-        // Extraer tiempos de producción
+        // Extract production times
         const timeData = data.map(run => ({
             run: run.run,
             productionTime: run.metrics['Production Time'] || 0
         }));
         
-        // Configurar dimensiones y márgenes
+        // Configure dimensions and margins
         const margin = {top: 40, right: 30, bottom: 60, left: 60};
         const width = 700 - margin.left - margin.right;
         const height = 400 - margin.top - margin.bottom;
         
-        // Crear el contenedor principal
+        // Create main container
         const g = svg.append("g")
             .attr("transform", `translate(${margin.left},${margin.top})`);
         
-        // Definir escalas
+        // Define scales
         const x = d3.scaleBand()
             .domain(timeData.map(d => d.run))
             .range([0, width])
@@ -108,7 +108,7 @@ class TimeCharts {
             .domain([d3.min(timeData, d => d.productionTime) * 0.9, d3.max(timeData, d => d.productionTime) * 1.1])
             .range([height, 0]);
         
-        // Agregar ejes
+        // Add axes
         g.append("g")
             .attr("transform", `translate(0,${height})`)
             .call(d3.axisBottom(x))
@@ -119,13 +119,13 @@ class TimeCharts {
         g.append("g")
             .call(d3.axisLeft(y));
         
-        // Definir la línea
+        // Define the line
         const line = d3.line()
             .x(d => x(d.run) + x.bandwidth() / 2)
             .y(d => y(d.productionTime))
             .curve(d3.curveMonotoneX);
         
-        // Dibujar la línea
+        // Draw the line
         g.append("path")
             .datum(timeData)
             .attr("fill", "none")
@@ -133,7 +133,7 @@ class TimeCharts {
             .attr("stroke-width", 3)
             .attr("d", line);
         
-        // Dibujar puntos
+        // Draw points
         g.selectAll(".dot")
             .data(timeData)
             .enter()
@@ -144,25 +144,25 @@ class TimeCharts {
             .attr("r", 5)
             .attr("fill", "#007bff");
         
-        // Agregar título
+        // Add title
         svg.append("text")
             .attr("x", width / 2 + margin.left)
             .attr("y", 20)
             .attr("text-anchor", "middle")
             .style("font-size", "16px")
             .style("font-weight", "bold")
-            .text("Tiempo de Producción por Día");
+            .text("Production Time by Day");
             
-        // Agregar título del eje Y
+        // Add Y-axis title
         svg.append("text")
             .attr("transform", "rotate(-90)")
             .attr("x", -(height / 2) - margin.top)
             .attr("y", 20)
             .attr("text-anchor", "middle")
             .style("font-size", "14px")
-            .text("Tiempo de Producción (unidades)");
+            .text("Production Time (units)");
         
-        // Agregar línea promedio
+        // Add average line
         const avgProductionTime = d3.mean(timeData, d => d.productionTime);
         
         g.append("line")
@@ -180,7 +180,7 @@ class TimeCharts {
             .attr("text-anchor", "end")
             .style("font-size", "12px")
             .style("fill", "#dc3545")
-            .text(`Promedio: ${avgProductionTime.toFixed(2)}`);
+            .text(`Average: ${avgProductionTime.toFixed(2)}`);
     }
     
     updateFixingTimeChart() {
@@ -189,25 +189,25 @@ class TimeCharts {
         const svg = this.charts.fixingTimeChart.svg;
         svg.selectAll("*").remove();
         
-        // Obtener datos filtrados para el período actual
+        // Get filtered data for current period
         const data = this.getCurrentPeriodData();
         
-        // Comprobar si hay datos
+        // Check if there is data
         if (!data || data.length === 0) {
             svg.append("text")
                 .attr("x", 350)
                 .attr("y", 200)
                 .attr("text-anchor", "middle")
-                .text("No hay datos disponibles para este período");
+                .text("No data available for this period");
             return;
         }
         
-        // Calcular tiempos de reparación promedio por estación
+        // Calculate average repair times by station
         const stationData = [];
         for (let i = 1; i <= 6; i++) {
             const fixingTimes = data.map(run => {
-                // Para este gráfico, multiplicamos el tiempo de inactividad por la tasa de fallos
-                // para obtener una visualización del impacto total
+                // For this chart, we multiply downtime by failure rate
+                // to get a visualization of total impact
                 const downtime = run.metrics[`Station ${i} Downtime`] || 0;
                 return downtime;
             });
@@ -215,21 +215,21 @@ class TimeCharts {
             const avgFixingTime = fixingTimes.reduce((sum, time) => sum + time, 0) / fixingTimes.length;
             
             stationData.push({
-                station: `Estación ${i}`,
+                station: `Station ${i}`,
                 fixingTime: avgFixingTime
             });
         }
         
-        // Configurar dimensiones y márgenes
+        // Configure dimensions and margins
         const margin = {top: 40, right: 30, bottom: 60, left: 60};
         const width = 700 - margin.left - margin.right;
         const height = 400 - margin.top - margin.bottom;
         
-        // Crear el contenedor principal
+        // Create main container
         const g = svg.append("g")
             .attr("transform", `translate(${margin.left},${margin.top})`);
         
-        // Definir escalas
+        // Define scales
         const x = d3.scaleBand()
             .domain(stationData.map(d => d.station))
             .range([0, width])
@@ -239,7 +239,7 @@ class TimeCharts {
             .domain([0, d3.max(stationData, d => d.fixingTime) * 1.1])
             .range([height, 0]);
         
-        // Agregar ejes
+        // Add axes
         g.append("g")
             .attr("transform", `translate(0,${height})`)
             .call(d3.axisBottom(x));
@@ -247,7 +247,7 @@ class TimeCharts {
         g.append("g")
             .call(d3.axisLeft(y));
         
-        // Crear gradiente para barras
+        // Create gradient for bars
         const defs = svg.append("defs");
         const gradient = defs.append("linearGradient")
             .attr("id", "fixingTimeGradient")
@@ -264,7 +264,7 @@ class TimeCharts {
             .attr("offset", "100%")
             .attr("stop-color", "#fd7e14");
         
-        // Dibujar barras
+        // Draw bars
         g.selectAll(".bar")
             .data(stationData)
             .enter()
@@ -277,7 +277,7 @@ class TimeCharts {
             .attr("fill", (d, i) => i === 3 ? "#dc3545" : "url(#fixingTimeGradient)")
             .attr("opacity", 0.8);
         
-        // Agregar etiquetas
+        // Add labels
         g.selectAll(".label")
             .data(stationData)
             .enter()
@@ -288,27 +288,27 @@ class TimeCharts {
             .attr("text-anchor", "middle")
             .text(d => d.fixingTime.toFixed(1));
         
-        // Agregar título
+        // Add title
         svg.append("text")
             .attr("x", width / 2 + margin.left)
             .attr("y", 20)
             .attr("text-anchor", "middle")
             .style("font-size", "16px")
             .style("font-weight", "bold")
-            .text("Tiempo de Reparación por Estación");
+            .text("Repair Time by Station");
             
-        // Agregar título del eje Y
+        // Add Y-axis title
         svg.append("text")
             .attr("transform", "rotate(-90)")
             .attr("x", -(height / 2) - margin.top)
             .attr("y", 20)
             .attr("text-anchor", "middle")
             .style("font-size", "14px")
-            .text("Tiempo de Reparación (unidades)");
+            .text("Repair Time (units)");
     }
     
     getCurrentPeriodData() {
-        // Obtener los datos según el período y fecha seleccionados
+        // Get data according to selected period and date
         const period = currentPeriod;
         const startDate = currentStartDate;
         const endDate = currentStartDate + getPeriodLength() - 1;
